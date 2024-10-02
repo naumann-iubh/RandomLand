@@ -28,12 +28,7 @@ public class GeneratorEndpoint {
     @Path("/population")
     @GET
     public Response population(@QueryParam("seed") Optional<Long> seed) throws IOException {
-        noise.generatePopulationHeatMap(seed);
-        for (int i = 0; i < 100; i++) {
-            for (int j = 0; j < 100; j++) {
-                Log.info((int) (99 * noise.getPopulationAtPosition(i, j)));
-            }
-        }
+
         return Response.ok().build();
     }
 

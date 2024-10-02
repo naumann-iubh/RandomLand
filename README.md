@@ -1,66 +1,131 @@
-# code-with-quarkus
+# RandomLand
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+Für Forschungsaktivitäten rund um die Wärmewende werden häufig Daten von Gebäuden (u.a. Fläche, Alter, Wohneinheiten,
+Wärmebedarf, Heizungstyp, etc.) benötigt.
+Nun ergibt sich für Veröffentlichungen zumeist das Problem, dass bei Echtdaten verschiedene Restriktionen greifen (
+Datenschutz, Unbundling, kritische Infrastruktur, Betriebsgeheimnis, etc.).
+Um dennoch detaillierte Berechnungen und Sensitivitätsanalysen zu den verschiedensten Fragestellungen anstellen und
+veröffentlichen zu können, soll in dieser Arbeit eine Anwendung erstellt werden, mit der
 
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
+- relevante Daten zu Gebäuden,
+- Flurstücken,
+- Siedlungsstrukturen,
+- Einwohnern/Nutzerverhalten zufällig erzeugt werden.
 
-## Running the application in dev mode
+Es handelt sich also um synthetische Daten.
 
-You can run your application in dev mode that enables live coding using:
+## Vorgehen
 
-```shell script
-./mvnw compile quarkus:dev
+- Zu Beginn wird eine Population-Heatmap [OpenSimplex2](https://github.com/phishman3579/java-algorithms-implementation)
+  generiert. Das sorgt bei jeder Anfrage zu einer zufälligen Verteilung der Bevölkerungsdichte.
+- RoadSystem wird mit durch das Lindenmayer-System generiert. Genauer wird sich hier an einer einfacheren Version  
+  Algorithmus Parish und Müller [link](https://cgl.ethz.ch/Downloads/Publications/Papers/2001/p_Par01.pdf). Kurz: Hier
+  werden mithilfe von Globalen und Lokalen Regeln Straßenabschnitte angelegt oder nicht.
+- Danach werden die Polygone aus dem Straßennetz extrahiert -> Baublöcke
+- Innerhalb der Baublöcke werden Flurstücke und deren Nutzung gesetzt.
+- Nach
+  gesammelten [Informationen](https://www.gebaeudeforum.de/wissen/zahlen-daten/gebaeudereport-2023/interaktive-diagramme/kapitel-1/)
+  werden Wohngebäude und nicht Wohngebäude verteilt.
+- Am Ende werden alle Geometrien entweder als Geopackage oder CVS exportiert.
+
+## Warum L-System
+
+In der Arbeit von Kelly und
+McCabe [A Survey of Procedurl Techniques for City Generation](http://www.citygen.net/files/Procedural_City_Generation_Survey.pdf)
+werden verschiedene Ansätze zur Generierung von Straßennetzen miteinander verglichen.
+Kriterien:
+
+1. **Realism** – Does the generated city look like a real city?
+2. **Scale** – Is the urban landscape at the scale of a city?
+3. **Variation** – Can the city generation system recreate the
+   variation of road networks and buildings found in real cities or
+   is the output homogeneous?
+4. **Input** – What is the minimal input data required to generate
+   basic output and what input data is required for the best
+   output?
+5. **Efficiency** – How long does it take to create the examples
+   shown and on what hardware are they generated? How
+   computational efficient is the algorithm?
+6. **Control** – Can the user influence city generation and receive
+   immediate feedback on their actions? Is there a tactile intuitive
+   method of control available or is the control restricted? To
+   what degree can the user influence the generation results?
+7. **Real-time** – Can the generated city be viewed in real-time?
+   Are there any rendering optimisation techniques applied to
+   enable real-time exploration?
+
+Wonach der Ansatz von Perish und Müller mit dem L-System einer der vielversprechendsten ist.
+
+## Objekt die generiert werden
+
+- Baublöcke
+    - Shape
+- Flurstück
+    - Shape
+    - Nutzungsart: Straße, Park oder Gebäude
+- Gebäude
+    - Shape
+    - Volumen
+    - Baujahr
+    - Nutzungsart: Wohnen, Gewerbe, Halle oder unbeheizt
+    - Wohnnutzung mit Anzahl Wohneinheiten
+    - Energieträger: Heizöl, Erdgas, Fernwärme
+    - TO-DO: Monatliche Durchschnittstemperatur und Normaußentemperatur
+
+## Export
+
+- zip mit mehreren Geopackages: Straße, Baublöcke, Flurstücke und Gebäude
+- TO-DO: CSV
+
+## Screenshot
+
+<img src="screenshot.png" alt="screenshot">
+
+## How to start
+
+Ausführbares .jar erstellen:
+
+ ```
+ mvn install
+ ```
+
+In Ordner target/quarkus-app Befehl ausführen:
+
+ ```
+ java -jar target/quarkus-app/quarkus-run.jar
+ ```
+
+## How to generate
+
+```
+POST <url>/gen/generate
 ```
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
+returns uuid for generation, optional query parameter seed
 
-## Packaging and running the application
-
-The application can be packaged using:
-
-```shell script
-./mvnw package
+```
+GET <url>/gen/status/<uuid>
 ```
 
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
+Returns current status of job
 
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
-
-If you want to build an _über-jar_, execute the following command:
-
-```shell script
-./mvnw package -Dquarkus.package.jar.type=uber-jar
+```
+GET <url>/gen/getGpgk/<uuid>
 ```
 
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
+Returns current geopackage as zip
 
-## Creating a native executable
+## Bestehende Probleme
 
-You can create a native executable using:
+- [ ] Flurstücke optimiert verteilen
+- [ ] Bug im Erstellen der Gebäudeumrisse
+- [ ] Generierung des Straßennetzwerks beschleunigen (Multithreading?)
+- [ ] Erstellen der JTS Geometry des Straßennetzwerks langsam (Geometry.union()) -> Geotools vermindert verwenden
 
-```shell script
-./mvnw package -Dnative
-```
+## Third-Party Libraries
 
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
+- [java-algorithms-implementation](https://github.com/phishman3579/java-algorithms-implementation)
+- [OpenSimplex2](https://github.com/KdotJPG/OpenSimplex2)
+- [Geotools](https://www.geotools.org/)
 
-```shell script
-./mvnw package -Dnative -Dquarkus.native.container-build=true
-```
 
-You can then execute your native executable with: `./target/code-with-quarkus-1.0.0-SNAPSHOT-runner`
-
-If you want to learn more about building native executables, please consult <https://quarkus.io/guides/maven-tooling>.
-
-## Related Guides
-
-- REST Jackson ([guide](https://quarkus.io/guides/rest#json-serialisation)): Jackson serialization support for Quarkus REST. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it
-
-## Provided Code
-
-### REST
-
-Easily start your REST Web Services
-
-[Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
