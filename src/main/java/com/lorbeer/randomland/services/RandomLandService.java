@@ -80,8 +80,8 @@ public class RandomLandService {
             final List<Gebaeude> gebaeude = geometryService.createPolygonsForBuildings(flurstueckUndNutzung);
             Log.info("Gebaude created.");
 
-//        RenderCity city = new RenderCity(roadGenerator.getNodeTree());
-//        city.export();
+//            RenderCity city = new RenderCity(roadGenerator.getNodeTree());
+//            city.export();
 
             createGeoPackage.createPackageRoad(roads, now, id);
             createGeoPackage.createPackageBaublock(baublock, now, id);
@@ -92,10 +92,13 @@ public class RandomLandService {
             }
             status.replace(id, Status.DONE);
         } catch (RoadGeometryException e) {
+            Log.error(e);
             status.replace(e.getId(), Status.ERROR);
         } catch (NodeTreeException e) {
+            Log.error(e);
             status.replace(e.getId(), Status.ERROR);
         } catch (CreatePackageException e) {
+            Log.error(e);
             status.replace(e.getId(), Status.ERROR);
         }
     }
