@@ -16,6 +16,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.operation.union.CascadedPolygonUnion;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 public class RoadGeometryService {
 
     private static final Logger Log = Logger.getLogger(RoadGeometryService.class);
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(RoadGeometryService.class);
 
     private final GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory();
 
@@ -37,7 +39,6 @@ public class RoadGeometryService {
 
     @ConfigProperty(name = "render.streetThickness", defaultValue = "2")
     Integer streetThickness;
-//    https://www.baeldung.com/java-completablefuture#Multiple
 
     public Flurstueck createRoadGeometry(NodeTree nodeTree, String id) throws RoadGeometryException {
         Log.info("size " + nodeTree.getNodes().size());
@@ -62,7 +63,6 @@ public class RoadGeometryService {
 
         Log.info("about to join");
         final Geometry geom = geometryFactory.buildGeometry(futures.stream().map(CompletableFuture::join).collect(Collectors.toList())).union();
-
         Log.info("joined");
         return new Flurstueck(geom, NutungsartFlurstueck.STRASSE);
     }
@@ -87,7 +87,6 @@ public class RoadGeometryService {
             }
         }
         Log.info("streets " + streets.size());
-
         final Geometry geom = CascadedPolygonUnion.union(streets);
         Log.info("filteredbyGeo " + geom.getNumGeometries());
 
@@ -99,6 +98,9 @@ public class RoadGeometryService {
         int mapDataSize = nodeEdges.size();
         int processed = 0;
         int chunkSize = mapDataSize / 10;
+        if (chunkSize > 7000) {
+            chunkSize = 7000;
+        }
         while (processed < mapDataSize) {
             int currentChunkSize = (mapDataSize - processed) >= chunkSize ? chunkSize : (mapDataSize - processed);
             chunkMapList.add(nodeEdges.entrySet().stream().skip(processed).limit(currentChunkSize).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));

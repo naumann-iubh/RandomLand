@@ -11,16 +11,12 @@ import org.jboss.logging.Logger;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.operation.overlay.OverlayOp;
 import org.locationtech.jts.operation.union.CascadedPolygonUnion;
-import org.slf4j.LoggerFactory;
 
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @ApplicationScoped
 public class BuildingGeometryService {
     private static final Logger Log = Logger.getLogger(BuildingGeometryService.class);
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(BuildingGeometryService.class);
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss");
     private final Random random = new Random();
 
     @ConfigProperty(name = "gebaeude.wohnen")
@@ -78,7 +74,7 @@ public class BuildingGeometryService {
         for (Polygon pol : cleanUp(filterFlurstuecke)) {
             if (pol.getArea() < 20000) {
                 if (pol.isValid()) {
-                    final List<Polygon> squares = getSquaresFromPol(pol, 3);
+                    final List<Polygon> squares = getSquaresFromPol(pol, 1);
                     if (!squares.isEmpty()) {
                         final Geometry geo = CascadedPolygonUnion.union(squares);
                         if (geo instanceof MultiPolygon) {
@@ -103,6 +99,7 @@ public class BuildingGeometryService {
     }
 
     private List<Gebaeude> createGebaeude(List<Polygon> polygons) {
+        Log.info("createGebäude");
         final Map<String, List<Polygon>> distribution = new HashMap<>();
         distribution.putIfAbsent("wohnen", new ArrayList<>());
         distribution.putIfAbsent("nichtwohngebaeude", new ArrayList<>());
@@ -281,18 +278,20 @@ public class BuildingGeometryService {
 
 
     private List<Polygon> cleanUp(List<Geometry> polygons) {
+        Log.info("clean up start");
         final List<Polygon> cleanedPolygons = new ArrayList<>();
 
         for (Geometry g : polygons) {
             if (!g.isEmpty()) {
                 if (g instanceof MultiPolygon) {
                     cleanedPolygons.addAll(Utils.iterateThroughMultiPolygon((MultiPolygon) g));
-                } else {
+                } else if (g instanceof Polygon) {
                     cleanedPolygons.add((Polygon) g);
+                } else {
+                    Log.info("cleanup type not added" + g.getGeometryType());
                 }
             }
         }
-        Log.info("cleanUp " + cleanedPolygons.size());
         return cleanedPolygons;
 
     }

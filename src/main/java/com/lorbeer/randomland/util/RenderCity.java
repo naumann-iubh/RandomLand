@@ -86,7 +86,6 @@ public class RenderCity {
     }
 
     public void export() {
-        final long time = System.currentTimeMillis();
         final LocalDateTime dateTime = LocalDateTime.now();
         final String filename = "city_" + dateTime.format(formatter) + ".png";
         File out = new File("./" + filename);
