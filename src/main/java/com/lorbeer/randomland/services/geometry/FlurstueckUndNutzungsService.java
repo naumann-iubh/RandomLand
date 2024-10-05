@@ -2,7 +2,6 @@ package com.lorbeer.randomland.services.geometry;
 
 import com.lorbeer.randomland.domain.Flurstueck;
 import com.lorbeer.randomland.domain.NutungsartFlurstueck;
-import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.geotools.geometry.jts.JTSFactoryFinder;
@@ -54,7 +53,6 @@ public class FlurstueckUndNutzungsService {
 
 
     private List<Geometry> divide(Polygon polygon) {
-        Log.info("divide");
         final List<Geometry> divided = new ArrayList<>();
         final DelaunayTriangulationBuilder delaunayTriangulationBuilder = new DelaunayTriangulationBuilder();
         delaunayTriangulationBuilder.setSites(polygon);
@@ -69,9 +67,7 @@ public class FlurstueckUndNutzungsService {
         voronoiDiagramBuilder.setSites(centerCoords);
         final Geometry voronoi = voronoiDiagramBuilder.getDiagram(geometryFactory);
         final Geometry tailored = voronoi.intersection(polygon);
-        Log.info("voronoi num " + voronoi.getNumGeometries());
         for (int i = 0; i < tailored.getNumGeometries(); i++) {
-
             divided.add(tailored.getGeometryN(i));
         }
 
@@ -79,7 +75,6 @@ public class FlurstueckUndNutzungsService {
     }
 
     private List<Geometry> mergeTooSmallPolygons(List<Geometry> polygons) {
-        Log.info("mergeTooSmallPolygons");
         final List<Geometry> mergedPolygons = new ArrayList<>(polygons.stream().filter(p -> p.getArea() > 20).toList());
         final List<Geometry> tooSmallPolygons = polygons.stream().filter(p -> p.getArea() <= 20).toList();
 
@@ -92,7 +87,6 @@ public class FlurstueckUndNutzungsService {
                 }
             }
         }
-
         return mergedPolygons;
     }
 }

@@ -50,21 +50,15 @@ public class RoadGenerator {
     private final Queue<SuggestedNode> suggestions = new ArrayDeque<>();
 
     public void startGeneration(String id) throws NodeTreeException {
-        do {
+        try {
+            generate(initHighwaySuggestions());
 
-            try {
-                generate(initHighwaySuggestions());
+            nodeTree.scaleAndSubdivide(highwayScaleFactor, highwaySubdivideCount);
 
-                nodeTree.scaleAndSubdivide(highwayScaleFactor, highwaySubdivideCount);
-
-                generate(initStreetSuggestions());
-            } catch (NodeTreeException e) {
-                throw new NodeTreeException(e.getMessage(), id);
-            }
-
-
-        } while (--repetitions > 0 && nodeTree.getNodes().size() < minRoadCount);
-
+            generate(initStreetSuggestions());
+        } catch (NodeTreeException e) {
+            throw new NodeTreeException(e.getMessage(), id);
+        }
     }
 
     private void generate(List<SuggestedNode> suggestedNodes) throws NodeTreeException {
