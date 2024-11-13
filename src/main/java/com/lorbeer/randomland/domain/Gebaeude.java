@@ -112,23 +112,15 @@ public final class Gebaeude {
 
     public int toBaujahr(Baujahrklassen baujahrklasse) {
         final Random random = new Random();
-        switch (baujahrklasse) {
-            case VORKRIEGSBAU:
-                return random.nextInt(1945 - 1920) + 1920;
-            case NACHKRIEGSBAU:
-                return random.nextInt(1976 - 1946) + 1946;
-            case ERSTE_WAERMESCHUTZVERORDNUNG:
-                return random.nextInt(1983 - 1977) + 1977;
-            case ZWEITE_WAERMESCHUTZVERORDNUNG:
-                return random.nextInt(1994 - 1984) + 1984;
-            case DRITTE_WAERMESCHUTZVERORDNUNG:
-                return random.nextInt(2001 - 1995) + 1995;
-            case ERSTE_EINSPARVERORDNUNG:
-                return random.nextInt(2007 - 2002) + 2002;
-            case ZWEITE_EINSPARVERORDNUNG:
-                return random.nextInt(2024 - 2007) + 2007;
-        }
-        return random.nextInt(2024 - 1945) + 1945;
+        return switch (baujahrklasse) {
+            case VORKRIEGSBAU -> random.nextInt(1945 - 1920) + 1920;
+            case NACHKRIEGSBAU -> random.nextInt(1976 - 1946) + 1946;
+            case ERSTE_WAERMESCHUTZVERORDNUNG -> random.nextInt(1983 - 1977) + 1977;
+            case ZWEITE_WAERMESCHUTZVERORDNUNG -> random.nextInt(1994 - 1984) + 1984;
+            case DRITTE_WAERMESCHUTZVERORDNUNG -> random.nextInt(2001 - 1995) + 1995;
+            case ERSTE_EINSPARVERORDNUNG -> random.nextInt(2007 - 2002) + 2002;
+            case ZWEITE_EINSPARVERORDNUNG -> random.nextInt(2024 - 2007) + 2007;
+        };
     }
 
     @Override
@@ -136,14 +128,7 @@ public final class Gebaeude {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
         var that = (Gebaeude) obj;
-        return Objects.equals(this.shape, that.shape) &&
-                Objects.equals(this.height, that.height) &&
-                Objects.equals(this.dach, that.dach) &&
-                Objects.equals(this.baujahrklasse, that.baujahrklasse) &&
-                Objects.equals(this.usage, that.usage) &&
-                Objects.equals(this.avgTemp, that.avgTemp) &&
-                Objects.equals(this.normTemp, that.normTemp) &&
-                Objects.equals(this.energy, that.energy);
+        return Objects.equals(this.shape, that.shape) && Objects.equals(this.height, that.height) && Objects.equals(this.dach, that.dach) && Objects.equals(this.baujahrklasse, that.baujahrklasse) && Objects.equals(this.usage, that.usage) && Objects.equals(this.avgTemp, that.avgTemp) && Objects.equals(this.normTemp, that.normTemp) && Objects.equals(this.energy, that.energy);
     }
 
     @Override
@@ -153,15 +138,10 @@ public final class Gebaeude {
 
     @Override
     public String toString() {
-        return "Gebaeude[" +
-                "shape=" + shape + ", " +
-                "height=" + height + ", " +
-                "dach=" + dach + ", " +
-                "baujahrklasse=" + baujahrklasse + ", " +
-                "usage=" + usage + ", " +
-                "avgTemp=" + avgTemp + ", " +
-                "normTemp=" + normTemp + ", " +
-                "energy=" + energy + ']';
+        return "Gebaeude[" + "shape=" + shape + ", " + "height=" + height + ", " + "dach=" + dach + ", " + "baujahrklasse=" + baujahrklasse + ", " + "usage=" + usage + ", " + "avgTemp=" + avgTemp + ", " + "normTemp=" + normTemp + ", " + "energy=" + energy + ']';
     }
 
+    public static String[] HEADER() {
+        return new String[]{"Shape", "Heigth", "Dach", "Volumen", "Baujahrklasse", "Nutzungsart", "AvgTemp", "NormTemp", "Energy"};
+    }
 }

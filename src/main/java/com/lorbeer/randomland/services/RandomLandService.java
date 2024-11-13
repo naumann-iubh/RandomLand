@@ -14,6 +14,8 @@ import com.lorbeer.randomland.services.geometry.BuildingGeometryService;
 import com.lorbeer.randomland.services.geometry.FlurstueckUndNutzungsService;
 import com.lorbeer.randomland.services.geometry.RoadGeometryService;
 import com.lorbeer.randomland.services.geopackage.CreateGeoPackage;
+import com.lorbeer.randomland.util.CSVExport;
+import com.lorbeer.randomland.util.Utils;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -54,10 +56,13 @@ public class RandomLandService {
     @Inject
     FlurstueckUndNutzungsService flurstueckUndNutzungsService;
 
+    @Inject
+    CSVExport csvExport;
+
     final Map<String, Status> status = new ConcurrentHashMap<>();
 
 
-    public void generate(Optional<Long> seed, String id) {
+    public void generate(Optional<Long> seed, String id, String exportType) {
         try {
             status.putIfAbsent(id, Status.RUNNING);
             final LocalDateTime now = LocalDateTime.now();
@@ -83,12 +88,27 @@ public class RandomLandService {
 //            RenderCity city = new RenderCity(roadGenerator.getNodeTree());
 //            city.export();
 
-            createGeoPackage.createPackageRoad(roads, now, id);
-            createGeoPackage.createPackageBaublock(baublock, now, id);
-            createGeoPackage.createPackageFlurstueck(flurstueckUndNutzung, now, id);
-            createGeoPackage.createPackageGebaeude(gebaeude, now, id);
+
+            switch (exportType) {
+                case "gpkg":
+                    createGeoPackage.createPackageRoad(roads, now, id);
+                    createGeoPackage.createPackageBaublock(baublock, now, id);
+                    createGeoPackage.createPackageFlurstueck(flurstueckUndNutzung, now, id);
+                    createGeoPackage.createPackageGebaeude(gebaeude, now, id);
+
+                    break;
+                case "csv":
+                    csvExport.csvExportRoad(roads);
+                    csvExport.csvExportBaublock(baublock);
+                    csvExport.csvExportFlurstueck(flurstueckUndNutzung);
+                    csvExport.csvExportGebaeude(gebaeude);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unsupported export type: " + exportType);
+
+            }
             if (!debug) {
-                createGeoPackage.zipFiles(id);
+                Utils.zipFiles(id, exportType);
             }
             status.replace(id, Status.DONE);
         } catch (RoadGeometryException e) {
@@ -101,6 +121,7 @@ public class RandomLandService {
             Log.error(e);
             status.replace(e.getId(), Status.ERROR);
         }
+
     }
 
     public Status getStatus(String id) {

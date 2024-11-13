@@ -19,6 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Set;
 
+// this is a simple Generator to show the road-design as .png
 public class RenderCity {
     private static final Logger Log = Logger.getLogger(RenderCity.class);
 

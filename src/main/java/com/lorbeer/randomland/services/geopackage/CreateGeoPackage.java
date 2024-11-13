@@ -20,18 +20,11 @@ import org.jboss.logging.Logger;
 import org.locationtech.jts.geom.Polygon;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 @ApplicationScoped
 public class CreateGeoPackage {
@@ -54,7 +47,6 @@ public class CreateGeoPackage {
             throw new CreatePackageException(e.getMessage(), id);
         }
     }
-
 
     public void createPackageBaublock(Baublock baubloecke, LocalDateTime start, String id) throws CreatePackageException {
         try {
@@ -98,7 +90,7 @@ public class CreateGeoPackage {
             final List<SimpleFeature> features = new ArrayList<>();
             for (Gebaeude geb : gebaeude) {
                 features.add(
-                        SimpleFeatureBuilder.build(type, new Object[]{geb.shape(), geb.volume(), geb.toBaujahr(geb.baujahrklasse()), geb.usage().getValue(), geb.wohneinheiten(), geb.energy().getName()}, "gebaeude4"));
+                        SimpleFeatureBuilder.build(type, new Object[]{geb.shape(), geb.volume(), geb.toBaujahr(geb.baujahrklasse()), geb.usage().getName(), geb.wohneinheiten(), geb.energy().getName()}, "gebaeude4"));
             }
             final SimpleFeatureCollection featureCollection = new ListFeatureCollection(type, features);
 
@@ -108,43 +100,15 @@ public class CreateGeoPackage {
         }
     }
 
-    public void zipFiles(String id) throws CreatePackageException {
-        final long dayInMillis = 86400000;
-        try {
-            final List<File> files = Stream.of(new File(path).listFiles()).filter(f -> f.getAbsoluteFile().toString().endsWith(".gpkg")).toList();
-            for (File file : files) {
-                FileTime fileTime = (FileTime) Files.getAttribute(file.toPath(), "creationTime");
-                if (System.currentTimeMillis() - fileTime.toMillis() > dayInMillis) {
-                    file.delete();
-                }
-            }
-            final FileOutputStream fos = new FileOutputStream(path + "/" + id + ".zip");
-            final ZipOutputStream zip = new ZipOutputStream(fos);
-
-            for (final File file : files) {
-                FileInputStream fis = new FileInputStream(file);
-                zip.putNextEntry(new ZipEntry(file.getName()));
-                byte[] bytes = new byte[1024];
-                int length;
-                while ((length = fis.read(bytes)) >= 0) {
-                    zip.write(bytes, 0, length);
-                }
-                fis.close();
-            }
-            zip.close();
-            fos.close();
-            files.forEach(File::delete);
-        } catch (IOException e) {
-            throw new CreatePackageException(e.getMessage(), id);
-        }
-
-    }
-
     private void createGeoPackage(String name, SimpleFeatureCollection collection, LocalDateTime start) throws
             IOException {
         final LocalDateTime dateTime = LocalDateTime.now();
 
-        final GeoPackage geopkg = new GeoPackage(new File(path + "/" + name + ".gpkg"));
+        final File gpkg = new File(path + "/" + name + ".gpkg");
+        if (!gpkg.getParentFile().exists()) {
+            gpkg.getParentFile().mkdirs();
+        }
+        final GeoPackage geopkg = new GeoPackage(gpkg);
         geopkg.init();
 
         final FeatureEntry entry = new FeatureEntry();

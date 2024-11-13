@@ -50,6 +50,13 @@
         </dependency>
 
         <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>5.9</version>
+        </dependency>
+
+
+        <dependency>
             <groupId>com.jwetherell.algorithms</groupId>
             <artifactId>java-algorithms-implementation</artifactId>
             <version>1.0</version>

@@ -7,13 +7,13 @@ public enum NutzungsartGebaeude {
     HALLE("Halle"),
     UNBEHEIZT("Unbeheizt");
 
-    private String value;
+    private final String name;
 
     NutzungsartGebaeude(String value) {
-        this.value = value;
+        this.name = value;
     }
 
-    public String getValue() {
-        return value;
+    public String getName() {
+        return name;
     }
 }
