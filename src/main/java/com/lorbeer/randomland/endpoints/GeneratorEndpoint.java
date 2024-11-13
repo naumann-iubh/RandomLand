@@ -9,7 +9,6 @@ import jakarta.ws.rs.core.Response;
 import org.jboss.logging.Logger;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -27,19 +26,16 @@ public class GeneratorEndpoint {
 
     @Path("/population")
     @GET
-    public Response population(@QueryParam("seed") Optional<Long> seed) throws IOException {
+    public Response population(@QueryParam("seed") Optional<Long> seed) {
 
         return Response.ok().build();
     }
 
-    @Path("/generate")
+    @Path("/generate/{type}")
     @POST
-    public Response generate(@QueryParam("seed") Optional<Long> seed) {
+    public Response generate(@QueryParam("seed") Optional<Long> seed, @PathParam("type") String exportType) {
         final UUID uuid = UUID.randomUUID();
-        CompletableFuture.runAsync(() -> {
-            randomLandService.generate(seed, uuid.toString());
-
-        });
+        CompletableFuture.runAsync(() -> randomLandService.generate(seed, uuid.toString(), exportType));
 
         return Response.ok(uuid.toString()).build();
     }

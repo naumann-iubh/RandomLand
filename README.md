@@ -18,8 +18,9 @@ Es handelt sich also um synthetische Daten.
 
 - Zu Beginn wird eine Population-Heatmap [OpenSimplex2](https://github.com/phishman3579/java-algorithms-implementation)
   generiert. Das sorgt bei jeder Anfrage zu einer zufälligen Verteilung der Bevölkerungsdichte.
-- RoadSystem wird mit durch das Lindenmayer-System generiert. Genauer wird sich hier an einer einfacheren Version  
-  Algorithmus Parish und Müller [link](https://cgl.ethz.ch/Downloads/Publications/Papers/2001/p_Par01.pdf). Kurz: Hier
+- RoadSystem wird durch das Lindenmayer-System generiert. Genauer wird hier eine vereinfachte Version vom
+  Algorithmus Parish und Müller [link](https://cgl.ethz.ch/Downloads/Publications/Papers/2001/p_Par01.pdf) verwendet.
+  Vereinfacht heißt in diesem Fall, es wurden weniger Regeln implementiert. Kurz: Hier
   werden mithilfe von Globalen und Lokalen Regeln Straßenabschnitte angelegt oder nicht.
 - Danach werden die Polygone aus dem Straßennetz extrahiert -> Baublöcke
 - Innerhalb der Baublöcke werden Flurstücke und deren Nutzung gesetzt.
@@ -75,7 +76,8 @@ Wonach der Ansatz von Perish und Müller mit dem L-System einer der vielversprec
 ## Export
 
 - zip mit mehreren Geopackages: Straße, Baublöcke, Flurstücke und Gebäude
-- TO-DO: CSV
+- zip mit mehreren CSV Dateien: -"-
+- Beide Formate beinhalten alle generierten Werte, wie im obigen Teil aufgelistet
 
 ## Screenshot
 
@@ -98,9 +100,10 @@ In Ordner target/quarkus-app Befehl ausführen:
 ## How to generate
 
 ```
-POST <url>/gen/generate
+POST <url>/gen/generate/{exportType}
 ```
 
+exportType = gpkg, csv   
 returns uuid for generation, optional query parameter seed
 
 ```
