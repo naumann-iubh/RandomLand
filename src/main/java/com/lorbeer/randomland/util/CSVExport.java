@@ -75,6 +75,9 @@ public class CSVExport {
         writeCSV(data, "gebaeude");
     }
 
+    public File getCSV(String id) {
+        return new File(path + "/" + id + ".zip");
+    }
 
     private void writeCSV(List<String[]> data, String name) {
         final LocalDateTime dateTime = LocalDateTime.now();

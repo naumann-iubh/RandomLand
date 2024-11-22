@@ -1,6 +1,5 @@
 package com.lorbeer.randomland.endpoints;
 
-import com.lorbeer.randomland.generator.PopulationGenerator;
 import com.lorbeer.randomland.services.RandomLandService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -19,17 +18,7 @@ public class GeneratorEndpoint {
     private static final Logger Log = Logger.getLogger(GeneratorEndpoint.class);
 
     @Inject
-    PopulationGenerator noise;
-
-    @Inject
     RandomLandService randomLandService;
-
-    @Path("/population")
-    @GET
-    public Response population(@QueryParam("seed") Optional<Long> seed) {
-
-        return Response.ok().build();
-    }
 
     @Path("/generate/{type}")
     @POST
@@ -51,6 +40,15 @@ public class GeneratorEndpoint {
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public Response getGpgk(@PathParam("id") String id) {
         File file = randomLandService.getGeopackage(id);
+        Log.info(file.getName());
+        return Response.ok(file, MediaType.APPLICATION_OCTET_STREAM).header("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"").build();
+    }
+
+    @Path("getCSV/{id}")
+    @GET
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response getCSV(@PathParam("id") String id) {
+        File file = randomLandService.getCSV(id);
         Log.info(file.getName());
         return Response.ok(file, MediaType.APPLICATION_OCTET_STREAM).header("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"").build();
     }

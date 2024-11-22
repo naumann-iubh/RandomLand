@@ -132,5 +132,9 @@ public class RandomLandService {
         return createGeoPackage.getGeopackage(id);
     }
 
+    public File getCSV(String id) {
+        return csvExport.getCSV(id);
+    }
+
 
 }

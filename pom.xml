@@ -48,14 +48,11 @@
             <artifactId>gt-geopkg</artifactId>
             <version>${geotools.version}</version>
         </dependency>
-
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
             <version>5.9</version>
         </dependency>
-
-
         <dependency>
             <groupId>com.jwetherell.algorithms</groupId>
             <artifactId>java-algorithms-implementation</artifactId>
@@ -77,6 +74,11 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-junit5</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-jacoco</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
