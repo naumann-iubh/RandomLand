@@ -41,6 +41,9 @@ public class RoadGeometryService {
     Integer streetThickness;
 
     public Flurstueck createRoadGeometry(NodeTree nodeTree, String id) throws RoadGeometryException {
+        if (nodeTree == null || nodeTree.getNodeEdges().isEmpty()) {
+            throw new RoadGeometryException("nodeTree null or getNodeEdges is empty", id);
+        }
         Log.info("size " + nodeTree.getNodes().size());
         final List<Map<Node, Set<Node>>> splittedMap = split(nodeTree.getNodeEdges());
 

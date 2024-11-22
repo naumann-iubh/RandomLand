@@ -12,14 +12,10 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Polygon;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -33,7 +29,7 @@ public class BaubloeckeService {
 
         final Geometry freeSpaceGeometry = createFreeSpaceGeometry(geometry);
         final MultiPolygon freeSpacePolygons = (MultiPolygon) freeSpaceGeometry;
-        List<Polygon> baublockPolygon = new ArrayList<>();
+        final List<Polygon> baublockPolygon = new ArrayList<>();
 
         for (Geometry polygon : Utils.iterateThroughMultiPolygon(freeSpacePolygons)) {
             if (polygon instanceof MultiPolygon) {
@@ -80,6 +76,7 @@ public class BaubloeckeService {
         return poly;
     }
 
+    /*
     private void saveImage(List<Shape> images) {
         final LocalDateTime now = LocalDateTime.now();
         int counter = 0;
@@ -94,5 +91,5 @@ public class BaubloeckeService {
                 throw new RuntimeException(e);
             }
         }
-    }
+    }*/
 }
