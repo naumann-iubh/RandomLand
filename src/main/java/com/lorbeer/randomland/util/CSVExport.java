@@ -9,6 +9,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.io.WKTWriter;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -16,9 +17,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class CSVExport {
@@ -31,18 +30,19 @@ public class CSVExport {
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss");
 
+    private final WKTWriter writer = new WKTWriter();
 
     public void csvExportRoad(Flurstueck road) {
-        final String coordinateList = Arrays.stream(road.shape().getCoordinates()).map(c -> "(" + c.x + ", " + c.y + ")").collect(Collectors.joining(","));
-        writeCSV(List.of(Flurstueck.HEADER(), new String[]{coordinateList, road.usage().getName()}), "road");
+        final String wkt = writer.write(road.shape());
+        writeCSV(List.of(Flurstueck.HEADER(), new String[]{wkt}), "road");
     }
 
     public void csvExportBaublock(Baublock baubloecke) {
         final List<String[]> data = new ArrayList<>();
         data.add(Baublock.HEADER());
         for (Polygon pol : baubloecke.shape()) {
-            final String coordinateList = Arrays.stream(pol.getCoordinates()).map(c -> "(" + c.x + ", " + c.y + ")").collect(Collectors.joining(","));
-            data.add(new String[]{coordinateList});
+            final String wkt = writer.write(pol);
+            data.add(new String[]{wkt});
         }
         writeCSV(data, "baublock");
     }
@@ -51,8 +51,8 @@ public class CSVExport {
         final List<String[]> data = new ArrayList<>();
         data.add(Flurstueck.HEADER());
         for (Flurstueck flurstueck : flurstuecke) {
-            final String coordinateList = Arrays.stream(flurstueck.shape().getCoordinates()).map(c -> "(" + c.x + ", " + c.y + ")").collect(Collectors.joining(","));
-            data.add(new String[]{coordinateList, flurstueck.usage().getName()});
+            final String wkt = writer.write(flurstueck.shape());
+            data.add(new String[]{wkt, flurstueck.usage().getName()});
         }
         writeCSV(data, "flurstueck");
     }
@@ -61,8 +61,9 @@ public class CSVExport {
         final List<String[]> data = new ArrayList<>();
         data.add(Gebaeude.HEADER());
         for (Gebaeude g : gebaeude) {
-            final String coordinateList = Arrays.stream(g.shape().getCoordinates()).map(c -> "(" + c.x + ", " + c.y + ")").collect(Collectors.joining(","));
-            data.add(new String[]{coordinateList,
+
+            final String wkt = writer.write(g.shape());
+            data.add(new String[]{wkt,
                     String.valueOf(g.height()),
                     g.dach().getName(),
                     String.valueOf(g.volume()),

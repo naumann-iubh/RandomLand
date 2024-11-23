@@ -142,6 +142,6 @@ public final class Gebaeude {
     }
 
     public static String[] HEADER() {
-        return new String[]{"Shape", "Heigth", "Dach", "Volumen", "Baujahrklasse", "Nutzungsart", "AvgTemp", "NormTemp", "Energy"};
+        return new String[]{"WKT", "Heigth", "Dach", "Volumen", "Baujahrklasse", "Nutzungsart", "AvgTemp", "NormTemp", "Energy"};
     }
 }
