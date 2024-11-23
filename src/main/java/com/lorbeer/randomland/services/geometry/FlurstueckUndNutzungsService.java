@@ -5,6 +5,7 @@ import com.lorbeer.randomland.domain.NutungsartFlurstueck;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.geotools.geometry.jts.JTSFactoryFinder;
+import org.jboss.logging.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -19,6 +20,7 @@ import java.util.Random;
 
 @ApplicationScoped
 public class FlurstueckUndNutzungsService {
+    private static final Logger Log = Logger.getLogger(FlurstueckUndNutzungsService.class);
 
     @ConfigProperty(name = "flurstueck.landschaftsgartenMinGroesse")
     Double landschaftsgartenMinGroesse;
@@ -35,6 +37,7 @@ public class FlurstueckUndNutzungsService {
         final List<Flurstueck> flurstueckList = new ArrayList<>();
 
         for (Polygon pol : polygon) {
+            Log.info(pol.getArea());
             if (pol.getArea() <= landschaftsgartenMinGroesse && pol.getArea() < landschaftsgartenMaxGroesse && rnd.nextInt(100) + 1 == chanceByForPark) {
                 flurstueckList.add(new Flurstueck(pol, NutungsartFlurstueck.PARK));
             } else {
