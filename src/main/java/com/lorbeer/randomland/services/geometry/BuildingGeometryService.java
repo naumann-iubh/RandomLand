@@ -21,6 +21,10 @@ public class BuildingGeometryService {
 
     @ConfigProperty(name = "gebaeude.wohnen")
     double percentageWohnen;
+    @ConfigProperty(name = "gebaeude.maxHeight")
+    double gebaudeMaxHeight;
+    @ConfigProperty(name = "gebaeude.minHeight")
+    double gebaudeMinHeight;
     @ConfigProperty(name = "wohnen.zweizimmer")
     double wohnenZweizimmer;
     @ConfigProperty(name = "wohnen.dreizimmer")
@@ -253,21 +257,17 @@ public class BuildingGeometryService {
         }
         final List<Gebaeude> returnList = new ArrayList<>();
         verteilungGebaeude.values().forEach(returnList::addAll);
-        verteilungBaujahr(returnList);
-        verteilungEnergie(returnList);
         return returnList;
     }
 
     private void getHeightRegardingLocation(List<Gebaeude> gebaeude) {
         //festgelegt an München -> nichts darf höher als Frauenkirche -> 100
-        final int maxHeight = 99;
         // https://stadt.muenchen.de/dam/jcr:a3936be0-d0ce-44f9-b4ef-46562c7efcfb/grz_gfz_2017_download.pdf
-        final double minHeight = 3;
         for (Gebaeude geb : gebaeude) {
             if (!geb.usage().equals(NutzungsartGebaeude.HALLE)) {
                 final Point point = geb.shape().getCentroid();
                 float population = populationGenerator.getPopulationAtPosition(point.getX(), point.getY());
-                geb.setHeight(Math.max(maxHeight * population, minHeight));
+                geb.setHeight(Math.max(gebaudeMaxHeight * population, gebaudeMinHeight));
             }
         }
     }
