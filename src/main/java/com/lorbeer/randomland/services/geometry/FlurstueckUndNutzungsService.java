@@ -26,6 +26,9 @@ public class FlurstueckUndNutzungsService {
     @ConfigProperty(name = "flurstueck.landschaftsgartenMaxGroesse")
     Double landschaftsgartenMaxGroesse;
 
+    @ConfigProperty(name = "flurstueck.landschaftsgartenProzentualerAnteil")
+    Double landschaftsgartenProzentualerAnteil;
+
     private final Random rnd = new Random();
     private final Integer chanceByForPark = 5;
     final GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory();

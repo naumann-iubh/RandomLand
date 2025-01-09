@@ -35,10 +35,10 @@ public class GeneratorEndpoint {
         return Response.ok(randomLandService.getStatus(id)).build();
     }
 
-    @Path("getGpgk/{id}")
+    @Path("getGpkg/{id}")
     @GET
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public Response getGpgk(@PathParam("id") String id) {
+    public Response getGpkg(@PathParam("id") String id) {
         File file = randomLandService.getGeopackage(id);
         Log.info(file.getName());
         return Response.ok(file, MediaType.APPLICATION_OCTET_STREAM).header("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"").build();
