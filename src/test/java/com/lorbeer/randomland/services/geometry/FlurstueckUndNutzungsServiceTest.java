@@ -5,16 +5,19 @@ import com.lorbeer.randomland.domain.Baublock;
 import com.lorbeer.randomland.domain.Flurstueck;
 import com.lorbeer.randomland.exception.NodeTreeException;
 import com.lorbeer.randomland.exception.RoadGeometryException;
+import com.lorbeer.randomland.generator.PopulationGenerator;
 import com.lorbeer.randomland.generator.RoadGenerator;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.QuarkusTestProfile;
 import io.quarkus.test.junit.TestProfile;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @QuarkusTest
 @TestProfile(FlurstueckUndNutzungsServiceTest.TestConfig.class)
@@ -31,6 +34,15 @@ public class FlurstueckUndNutzungsServiceTest {
 
     @Inject
     FlurstueckUndNutzungsService flurstueckUndNutzungsService;
+
+    @Inject
+    PopulationGenerator populationGenerator;
+
+    @BeforeEach
+    public void init() {
+        populationGenerator.generatePopulationHeatMap(Optional.empty(), "test");
+    }
+
 
     @Test
     public void createFlurstueckundNutzung() throws NodeTreeException, RoadGeometryException {

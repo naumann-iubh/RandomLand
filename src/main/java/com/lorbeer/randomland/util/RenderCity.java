@@ -9,12 +9,8 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 import org.locationtech.jts.math.Vector2D;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Set;
@@ -37,7 +33,7 @@ public class RenderCity {
         this.nodeTree = nodeTree;
     }
 
-    private BufferedImage render() {
+    public BufferedImage render() {
         Log.info("Rendering City w " + nodeTree.getWidth() + " h " + nodeTree.getHeight());
         BufferedImage image = new BufferedImage(nodeTree.getWidth(), nodeTree.getHeight(), BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();
@@ -86,25 +82,5 @@ public class RenderCity {
         return image;
     }
 
-    public void export() {
-        final LocalDateTime dateTime = LocalDateTime.now();
-        final String filename = "city_" + dateTime.format(formatter) + ".png";
-        File out = new File("./" + filename);
 
-        BufferedImage image = render();
-        synchronized (RenderCity.class) {
-            try {
-                ImageIO.write(image, "png", out);
-            } catch (IOException e) {
-                Log.error(e.getMessage());
-            }
-        }
-    }
-
-    private void drawOval(Graphics2D g, Vector2D point, int radius, boolean fill) {
-        if (fill)
-            g.fillOval((int) point.getX() - radius / 2, (int) (point.getY() - radius / 2), radius, radius);
-        else
-            g.drawOval((int) point.getX() - radius / 2, (int) (point.getY() - radius / 2), radius, radius);
-    }
 }

@@ -7,10 +7,12 @@ import io.quarkus.test.junit.QuarkusTestProfile;
 import io.quarkus.test.junit.TestProfile;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.math.Vector2D;
 
 import java.util.Map;
+import java.util.Optional;
 
 @QuarkusTest
 @TestProfile(RoadGeneratorTest.TestConfig.class)
@@ -18,6 +20,14 @@ public class RoadGeneratorTest {
 
     @Inject
     RoadGenerator roadGenerator;
+
+    @Inject
+    PopulationGenerator populationGenerator;
+
+    @BeforeEach
+    public void init() {
+        populationGenerator.generatePopulationHeatMap(Optional.empty(), "test");
+    }
 
     @Test
     public void testGenerate() throws NodeTreeException {

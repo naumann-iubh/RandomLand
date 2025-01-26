@@ -32,7 +32,6 @@ public class FlurstueckUndNutzungsService {
     Double landschaftsgartenProzentualerAnteil;
 
     private final Random rnd = new Random();
-    private final Integer chanceByForPark = 5;
     final GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory();
 
     public List<Flurstueck> createFlurstueckundNutzung(List<Polygon> polygon) {
@@ -40,8 +39,8 @@ public class FlurstueckUndNutzungsService {
         final List<Flurstueck> flurstueckList = new ArrayList<>();
 
         for (Polygon pol : polygon) {
-            Log.info(pol.getArea());
-            if (pol.getArea() <= landschaftsgartenMinGroesse && pol.getArea() < landschaftsgartenMaxGroesse && rnd.nextInt(100) + 1 == chanceByForPark) {
+            Log.info("createFlurstueckundNutzung " + pol.getArea());
+            if (pol.getArea() <= landschaftsgartenMinGroesse && pol.getArea() < landschaftsgartenMaxGroesse && rnd.nextInt(100) + 1 == landschaftsgartenProzentualerAnteil) {
                 flurstueckList.add(new Flurstueck(pol, NutungsartFlurstueck.PARK));
             } else {
                 if (pol.getArea() < 80) {
@@ -59,20 +58,27 @@ public class FlurstueckUndNutzungsService {
 
 
     private List<Geometry> divide(Polygon polygon) {
+        Log.info("divide " + polygon.getNumGeometries());
         final List<Geometry> divided = new ArrayList<>();
         final DelaunayTriangulationBuilder delaunayTriangulationBuilder = new DelaunayTriangulationBuilder();
         delaunayTriangulationBuilder.setSites(polygon);
         final Geometry triangulation = delaunayTriangulationBuilder.getTriangles(geometryFactory);
-
+        Log.info("divide delauny");
         final VoronoiDiagramBuilder voronoiDiagramBuilder = new VoronoiDiagramBuilder();
+        Log.info("divide voronoi 1");
         voronoiDiagramBuilder.setClipEnvelope(polygon.getEnvelopeInternal());
+        Log.info("divide voronoi 2");
         List<Coordinate> centerCoords = new ArrayList<>();
         for (int i = 0; i < triangulation.getNumGeometries(); i++) {
             centerCoords.add(triangulation.getGeometryN(i).getCentroid().getCoordinate());
         }
+        Log.info("divide voronoi 3");
         voronoiDiagramBuilder.setSites(centerCoords);
+        Log.info("divide voronoi 4");
         final Geometry voronoi = voronoiDiagramBuilder.getDiagram(geometryFactory);
+        Log.info("divide voronoi 5");
         final Geometry tailored = voronoi.intersection(polygon);
+        Log.info("divide voronoi 6");
         for (int i = 0; i < tailored.getNumGeometries(); i++) {
             divided.add(tailored.getGeometryN(i));
         }
@@ -81,6 +87,7 @@ public class FlurstueckUndNutzungsService {
     }
 
     private List<Geometry> mergeTooSmallPolygons(List<Geometry> polygons) {
+        Log.info("mergeTooSmallPolygons " + polygons.size());
         final List<Geometry> mergedPolygons = new ArrayList<>(polygons.stream().filter(p -> p.getArea() > 20).toList());
         final List<Geometry> tooSmallPolygons = polygons.stream().filter(p -> p.getArea() <= 20).toList();
 

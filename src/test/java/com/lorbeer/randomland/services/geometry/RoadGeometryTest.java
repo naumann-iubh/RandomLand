@@ -4,6 +4,7 @@ package com.lorbeer.randomland.services.geometry;
 import com.lorbeer.randomland.domain.Flurstueck;
 import com.lorbeer.randomland.exception.NodeTreeException;
 import com.lorbeer.randomland.exception.RoadGeometryException;
+import com.lorbeer.randomland.generator.PopulationGenerator;
 import com.lorbeer.randomland.generator.RoadGenerator;
 import com.lorbeer.randomland.generator.domain.NodeTree;
 import io.quarkus.test.junit.QuarkusTest;
@@ -11,9 +12,11 @@ import io.quarkus.test.junit.QuarkusTestProfile;
 import io.quarkus.test.junit.TestProfile;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -26,6 +29,15 @@ public class RoadGeometryTest {
 
     @Inject
     RoadGeometryService roadGeometryService;
+
+    @Inject
+    PopulationGenerator populationGenerator;
+
+    @BeforeEach
+    public void init() {
+        populationGenerator.generatePopulationHeatMap(Optional.empty(), "test");
+    }
+
 
     @Test
     public void testRoadGeometry() throws NodeTreeException, RoadGeometryException {
@@ -41,7 +53,7 @@ public class RoadGeometryTest {
 
         Assertions.assertThrows(RoadGeometryException.class, () -> roadGeometryService.createRoadGeometry(null, "test"));
 
-        Assertions.assertThrows(RoadGeometryException.class, () -> roadGeometryService.createRoadGeometry(new NodeTree(), "test"));
+        Assertions.assertThrows(RoadGeometryException.class, () -> roadGeometryService.createRoadGeometry(new NodeTree(0, 0), "test"));
     }
 
 

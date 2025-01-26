@@ -11,16 +11,13 @@ import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 import org.locationtech.jts.math.Vector2D;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 @ApplicationScoped
 public class RoadGenerator {
     private static final Logger Log = Logger.getLogger(RoadGenerator.class);
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(RoadGenerator.class);
 
-    @Inject
     NodeTree nodeTree;
 
     @Inject
@@ -47,9 +44,15 @@ public class RoadGenerator {
     @ConfigProperty(name = "highway.scaleFactor")
     Integer highwayScaleFactor;
 
+    @ConfigProperty(name = "city.width")
+    int width;
+    @ConfigProperty(name = "city.height")
+    int height;
+
     private final Queue<SuggestedNode> suggestions = new ArrayDeque<>();
 
     public void startGeneration(String id) throws NodeTreeException {
+        nodeTree = new NodeTree(width, height);
         try {
             generate(initHighwaySuggestions());
 

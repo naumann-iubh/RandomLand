@@ -94,7 +94,7 @@ Ausführbares .jar erstellen:
 In Ordner target/quarkus-app Befehl ausführen:
 
  ```
- java -jar target/quarkus-app/quarkus-run.jar
+ java -Dquarkus.config.locations=<path/to/config> -jar target/quarkus-app/quarkus-run.jar
  ```
 
 ## How to generate

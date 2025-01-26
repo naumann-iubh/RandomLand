@@ -2,8 +2,6 @@ package com.lorbeer.randomland.generator.domain;
 
 import com.jwetherell.algorithms.data_structures.KdTree;
 import com.lorbeer.randomland.exception.NodeTreeException;
-import jakarta.enterprise.context.ApplicationScoped;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 import org.locationtech.jts.math.Vector2D;
 
@@ -11,18 +9,21 @@ import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 
-@ApplicationScoped
+
 public class NodeTree {
     private static final Logger Log = Logger.getLogger(NodeTree.class);
 
-    @ConfigProperty(name = "city.width")
     int width;
-    @ConfigProperty(name = "city.height")
     int height;
 
     private Map<Vector2D, Node> nodes = new HashMap<>();
     private Map<Node, Set<Node>> nodeEdges = new HashMap<>();
     private KdTree<SpatialNode> spatialKdTree = new KdTree<>();
+
+    public NodeTree(int width, int height) {
+        this.width = width;
+        this.height = height;
+    }
 
     public Node addNode(Vector2D point, RoadType roadType) throws NodeTreeException {
 

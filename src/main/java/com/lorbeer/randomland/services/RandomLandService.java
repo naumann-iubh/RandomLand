@@ -9,6 +9,7 @@ import com.lorbeer.randomland.exception.NodeTreeException;
 import com.lorbeer.randomland.exception.RoadGeometryException;
 import com.lorbeer.randomland.generator.PopulationGenerator;
 import com.lorbeer.randomland.generator.RoadGenerator;
+import com.lorbeer.randomland.generator.domain.NodeTree;
 import com.lorbeer.randomland.services.geometry.BaubloeckeService;
 import com.lorbeer.randomland.services.geometry.BuildingGeometryService;
 import com.lorbeer.randomland.services.geometry.FlurstueckUndNutzungsService;
@@ -60,17 +61,18 @@ public class RandomLandService {
     CSVExport csvExport;
 
     final Map<String, Status> status = new ConcurrentHashMap<>();
-
+    final Map<String, NodeTree> nodeTrees = new ConcurrentHashMap<>();
 
     public void generate(Optional<Long> seed, String id, String exportType) {
         try {
             status.putIfAbsent(id, Status.RUNNING);
             final LocalDateTime now = LocalDateTime.now();
             Log.info("Generating random land...");
-            populationGenerator.generatePopulationHeatMap(seed);
+            populationGenerator.generatePopulationHeatMap(seed, id);
             Log.info("Population heat map generated.");
             Log.info("Start road generation.");
             roadGenerator.startGeneration(id);
+            nodeTrees.put(id, roadGenerator.getNodeTree());
             Log.info("road  generated.");
             Log.info("road geometry started");
             final Flurstueck roads = roadGeometryService.createRoadGeometry(roadGenerator.getNodeTree(), id);
@@ -84,9 +86,6 @@ public class RandomLandService {
             Log.info("Start create Gebaude...");
             final List<Gebaeude> gebaeude = geometryService.createPolygonsForBuildings(flurstueckUndNutzung);
             Log.info("Gebaude created.");
-
-//            RenderCity city = new RenderCity(roadGenerator.getNodeTree());
-//            city.export();
 
 
             switch (exportType) {
@@ -126,6 +125,13 @@ public class RandomLandService {
 
     public Status getStatus(String id) {
         return status.getOrDefault(id, Status.NOT_FOUND);
+    }
+
+    public Optional<NodeTree> getNodetree(String id) {
+        if (nodeTrees.containsKey(id)) {
+            return Optional.of(nodeTrees.get(id));
+        }
+        return Optional.empty();
     }
 
     public File getGeopackage(String id) {
