@@ -65,20 +65,15 @@ public class FlurstueckUndNutzungsService {
         final Geometry triangulation = delaunayTriangulationBuilder.getTriangles(geometryFactory);
         Log.info("divide delauny");
         final VoronoiDiagramBuilder voronoiDiagramBuilder = new VoronoiDiagramBuilder();
-        Log.info("divide voronoi 1");
         voronoiDiagramBuilder.setClipEnvelope(polygon.getEnvelopeInternal());
-        Log.info("divide voronoi 2");
         List<Coordinate> centerCoords = new ArrayList<>();
         for (int i = 0; i < triangulation.getNumGeometries(); i++) {
             centerCoords.add(triangulation.getGeometryN(i).getCentroid().getCoordinate());
         }
-        Log.info("divide voronoi 3");
         voronoiDiagramBuilder.setSites(centerCoords);
-        Log.info("divide voronoi 4");
         final Geometry voronoi = voronoiDiagramBuilder.getDiagram(geometryFactory);
-        Log.info("divide voronoi 5");
+        Log.info("divide voronoi intersection");
         final Geometry tailored = voronoi.intersection(polygon);
-        Log.info("divide voronoi 6");
         for (int i = 0; i < tailored.getNumGeometries(); i++) {
             divided.add(tailored.getGeometryN(i));
         }

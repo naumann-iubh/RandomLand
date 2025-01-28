@@ -1,7 +1,7 @@
 package com.lorbeer.randomland.generator.domain;
 
-import com.jwetherell.algorithms.data_structures.KdTree;
 import com.lorbeer.randomland.exception.NodeTreeException;
+import edu.jwetherell.algorithms.dataStructures.KdTree;
 import org.jboss.logging.Logger;
 import org.locationtech.jts.math.Vector2D;
 
@@ -81,9 +81,8 @@ public class NodeTree {
         nodeEdges.clear();
         nodes.clear();
 
-        for (SpatialNode spatialNode : spatialKdTree) {
-            spatialKdTree.remove(spatialNode);
-        }
+
+        spatialKdTree = new KdTree<>();
 
         for (Map.Entry<Node, Set<Node>> entry : nodeEdgesCopy.entrySet()) {
             Node node = entry.getKey();
@@ -118,8 +117,21 @@ public class NodeTree {
 
     private static class SpatialNode extends KdTree.XYZPoint {
 
+        private double x;
+        private double y;
+
         public SpatialNode(Vector2D point) {
             super(point.getX(), point.getY());
+            this.x = point.getX();
+            this.y = point.getY();
+        }
+
+        public double getX() {
+            return x;
+        }
+
+        public double getY() {
+            return y;
         }
     }
 

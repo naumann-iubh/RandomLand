@@ -85,17 +85,29 @@ Wonach der Ansatz von Perish und Müller mit dem L-System einer der vielversprec
 
 ## How to start
 
-Ausführbares .jar erstellen:
+Anpassung der [Konfiguration](erklärung_application.md)
 
- ```
+### Ausführbares .jar erstellen:
+
+ ```shell
  mvn install
  ```
 
 In Ordner target/quarkus-app Befehl ausführen:
 
- ```
+ ```shell
  java -Dquarkus.config.locations=<path/to/config> -jar target/quarkus-app/quarkus-run.jar
  ```
+
+### Docker Container
+
+Um es in einem Docker Container zu starten mit einer eigenen Konfiguration:
+application.properties in diesem Verzeichnis ablegen
+
+```shell
+mvn clean install
+bash run_in_docker.sh
+```
 
 ## How to generate
 
