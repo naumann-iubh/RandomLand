@@ -1,0 +1,17 @@
+### Startet den Prozess und liefert eine uuid zurück die für <uuid> eingesetzt werden muss, <format> gpkg oder csv
+POST http://localhost:8080/gen/generate/gpkg
+
+### Gibt den aktuellen Zustand des Prozesses zurück
+GET http://localhost:8080/gen/status/<uuid>
+
+### Gibt bei angefragten Geopackage dieses zurück
+GET http://localhost:8080/gen/getGpkg/<uuid>
+
+### Gibt bei angefragten CSV dieses zurück
+GET http://localhost:8080/gen/getCSV/<uuid>
+
+### Gibt die erstellte Heatmap, als .png, zu der uuid zurück
+GET http://localhost:8080/utility/heatmap?uuid=<uuid>
+
+### Gibt die erstellte Roadmap, als .png, zu der uuid zurück
+GET http://localhost:8080/utility/roadmap?uuid=<uuid>

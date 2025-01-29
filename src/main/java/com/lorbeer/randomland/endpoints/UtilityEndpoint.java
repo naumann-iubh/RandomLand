@@ -27,7 +27,7 @@ public class UtilityEndpoint {
     @Inject
     RandomLandService randomLandService;
 
-    @Path("/heatmap/")
+    @Path("/heatmap")
     @GET
     @Produces("image/png")
     public Response getHeatmap(@QueryParam("uuid") String uuid) throws IOException {
@@ -42,7 +42,7 @@ public class UtilityEndpoint {
     }
 
 
-    @Path("/roadmap/")
+    @Path("/roadmap")
     @GET
     @Produces("image/png")
     public Response getRoadmap(@QueryParam("uuid") String uuid) throws IOException {

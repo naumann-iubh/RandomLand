@@ -21,6 +21,7 @@ import org.locationtech.jts.geom.Polygon;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class CreateGeoPackage {
     String path;
 
 
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss");
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm_ss");
 
     public void createPackageRoad(Flurstueck road, LocalDateTime start, String id) throws CreatePackageException {
         try {
@@ -104,13 +105,14 @@ public class CreateGeoPackage {
             IOException {
         final LocalDateTime dateTime = LocalDateTime.now();
 
-        final File gpkg = new File(path + "/" + name + ".gpkg");
+        final File gpkg = new File(path + FileSystems.getDefault().getSeparator() + name + ".gpkg");
+
         if (!gpkg.getParentFile().exists()) {
             gpkg.getParentFile().mkdirs();
         }
+
         final GeoPackage geopkg = new GeoPackage(gpkg);
         geopkg.init();
-
         final FeatureEntry entry = new FeatureEntry();
         entry.setDescription("RandomLand_" + name);
         geopkg.addCRS(25832);
@@ -122,9 +124,6 @@ public class CreateGeoPackage {
     }
 
     public File getGeopackage(String id) {
-        return new File(path + "/" + id + ".zip");
+        return new File(path + FileSystems.getDefault().getSeparator() + id + ".zip");
     }
-
-
-//    https://github.com/ngageoint/geopackage-core-java
 }

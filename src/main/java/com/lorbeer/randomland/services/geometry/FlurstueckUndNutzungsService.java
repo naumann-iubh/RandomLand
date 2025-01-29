@@ -17,6 +17,7 @@ import org.locationtech.jts.triangulate.VoronoiDiagramBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.*;
 
 @ApplicationScoped
 public class FlurstueckUndNutzungsService {
@@ -58,12 +59,11 @@ public class FlurstueckUndNutzungsService {
 
 
     private List<Geometry> divide(Polygon polygon) {
-        Log.info("divide " + polygon.getNumGeometries());
+        Log.info("divide ");
         final List<Geometry> divided = new ArrayList<>();
         final DelaunayTriangulationBuilder delaunayTriangulationBuilder = new DelaunayTriangulationBuilder();
         delaunayTriangulationBuilder.setSites(polygon);
         final Geometry triangulation = delaunayTriangulationBuilder.getTriangles(geometryFactory);
-        Log.info("divide delauny");
         final VoronoiDiagramBuilder voronoiDiagramBuilder = new VoronoiDiagramBuilder();
         voronoiDiagramBuilder.setClipEnvelope(polygon.getEnvelopeInternal());
         List<Coordinate> centerCoords = new ArrayList<>();
@@ -71,18 +71,36 @@ public class FlurstueckUndNutzungsService {
             centerCoords.add(triangulation.getGeometryN(i).getCentroid().getCoordinate());
         }
         voronoiDiagramBuilder.setSites(centerCoords);
-        final Geometry voronoi = voronoiDiagramBuilder.getDiagram(geometryFactory);
-        Log.info("divide voronoi intersection");
-        final Geometry tailored = voronoi.intersection(polygon);
-        for (int i = 0; i < tailored.getNumGeometries(); i++) {
-            divided.add(tailored.getGeometryN(i));
+        try (final ExecutorService executorService = Executors.newSingleThreadExecutor()) {
+            final Future<List<Geometry>> future = executorService.submit(intersection(polygon, voronoiDiagramBuilder));
+            try {
+                divided.addAll(future.get(300, TimeUnit.MILLISECONDS));
+            } catch (TimeoutException | InterruptedException | ExecutionException e) {
+                future.cancel(true);
+                divided.add(polygon);
+                Log.info("divide timeout");
+            } finally {
+                executorService.shutdown();
+            }
         }
-
         return mergeTooSmallPolygons(divided);
     }
 
+
+    private Callable<List<Geometry>> intersection(Polygon polygon, VoronoiDiagramBuilder voronoiDiagramBuilder) {
+        return () -> {
+
+            final List<Geometry> divided = new ArrayList<>();
+            final Geometry voronoi = voronoiDiagramBuilder.getDiagram(geometryFactory);
+            final Geometry tailored = voronoi.intersection(polygon);
+            for (int i = 0; i < tailored.getNumGeometries(); i++) {
+                divided.add(tailored.getGeometryN(i));
+            }
+            return divided;
+        };
+    }
+
     private List<Geometry> mergeTooSmallPolygons(List<Geometry> polygons) {
-        Log.info("mergeTooSmallPolygons " + polygons.size());
         final List<Geometry> mergedPolygons = new ArrayList<>(polygons.stream().filter(p -> p.getArea() > 20).toList());
         final List<Geometry> tooSmallPolygons = polygons.stream().filter(p -> p.getArea() <= 20).toList();
 

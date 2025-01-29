@@ -14,6 +14,7 @@ import org.locationtech.jts.io.WKTWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -24,11 +25,10 @@ public class CSVExport {
 
     private static final Logger Log = Logger.getLogger(CSVExport.class);
 
-
     @ConfigProperty(name = "csv.path")
     String path;
 
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss");
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm_ss");
 
     private final WKTWriter writer = new WKTWriter();
 
@@ -77,22 +77,23 @@ public class CSVExport {
     }
 
     public File getCSV(String id) {
-        return new File(path + "/" + id + ".zip");
+        return new File(path + FileSystems.getDefault().getSeparator() + id + ".zip");
     }
 
     private void writeCSV(List<String[]> data, String name) {
         final LocalDateTime dateTime = LocalDateTime.now();
 
-        final File csv = new File(path, "csv_" + name + "_" + dateTime.format(formatter) + ".csv");
+        final File csv = new File(path+ FileSystems.getDefault().getSeparator() + "csv_" + name + "_" + dateTime.format(formatter) + ".csv");
         if (!csv.getParentFile().exists()) {
             csv.getParentFile().mkdirs();
         }
-        try (final CSVWriter writer = new CSVWriter(new FileWriter(csv))) {
+        try (final CSVWriter writer = new CSVWriter(new FileWriter(csv.getAbsolutePath()))) {
             writer.writeAll(data);
         } catch (IOException e) {
             Log.error("Not able to create csv " + csv.getName(), e);
         }
 
+        Log.info("CSV for " + name + " created " + dateTime.format(formatter));
 
     }
 }
