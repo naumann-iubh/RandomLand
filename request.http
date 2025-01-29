@@ -1,5 +1,5 @@
 ### Startet den Prozess und liefert eine uuid zurück die für <uuid> eingesetzt werden muss, <format> gpkg oder csv
-POST http://localhost:8080/gen/generate/gpkg
+POST http://localhost:8080/gen/generate/<format>
 
 ### Gibt den aktuellen Zustand des Prozesses zurück
 GET http://localhost:8080/gen/status/<uuid>
